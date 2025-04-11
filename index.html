@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Starrunner To-Do</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      transition: background-color 0.3s ease;
+    }
+    .dark-mode {
+      background-color: #121212;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+    }
+    .column {
+      flex: 1;
+      min-width: 280px;
+      max-width: 300px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      padding: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    .not-started {
+      border: 4px solid #fc031c;
+    }
+    .in-progress {
+      border: 4px solid #fce303;
+    }
+    .completed {
+      border: 4px solid #30fc03;
+    }
+    h2 {
+      text-align: center;
+    }
+    .task {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #b603fc;
+      color: white;
+    }
+    .task input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: white;
+      font-size: 1em;
+    }
+    .task input:focus {
+      outline: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    .task button {
+      margin-left: 5px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .add-task {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .add-task input {
+      flex: 1;
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
+    }
+    .add-task button {
+      background-color: #b603fc;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .toggle-mode {
+      background-color: #b603fc;
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    @media (max-width: 768px) {
+      .columns {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-mode" onclick="toggleDarkMode()">Toggle Mode</button>
+  <div class="container">
+    <h1>Starrunner To-Do</h1>
+    <div class="columns">
+      <div class="column not-started">
+        <h2>Not Started Yet</h2>
+        <div class="tasks" id="not-started"></div>
+        <div class="add-task">
+          <input type="text" id="new-task-not-started" placeholder="New task..." />
+          <button onclick="addTask('not-started')">Add</button>
+        </div>
+      </div>
+      <div class="column in-progress">
+        <h2>In Progress</h2>
+        <div class="tasks" id="in-progress"></div>
+        <div class="add-task">
+          <input type="text" id="new-task-in-progress" placeholder="New task..." />
+          <button onclick="addTask('in-progress')">Add</button>
+        </div>
+      </div>
+      <div class="column completed">
+        <h2>Completed</h2>
+        <div class="tasks" id="completed"></div>
+        <div class="add-task">
+          <input type="text" id="new-task-completed" placeholder="New task..." />
+          <button onclick="addTask('completed')">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const colors = ['#b603fc', '#03a9fc', '#03fc98', '#fcba03', '#fc036f'];
+    function addTask(columnId) {
+      const input = document.getElementById(`new-task-${columnId}`);
+      const text = input.value.trim();
+      if (!text) return;
+      const task = document.createElement('div');
+      task.className = 'task';
+      task.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+      const inputField = document.createElement('input');
+      inputField.type = 'text';
+      inputField.value = text;
+      inputField.setAttribute('readonly', true);
+      inputField.addEventListener('dblclick', () => {
+        inputField.removeAttribute('readonly');
+        inputField.focus();
+      });
+      inputField.addEventListener('blur', () => {
+        inputField.setAttribute('readonly', true);
+      });
+
+      const editBtn = document.createElement('button');
+      editBtn.innerText = '✎';
+      editBtn.onclick = () => {
+        inputField.removeAttribute('readonly');
+        inputField.focus();
+      };
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.innerText = '✕';
+      deleteBtn.onclick = () => task.remove();
+
+      task.appendChild(inputField);
+      task.appendChild(editBtn);
+      task.appendChild(deleteBtn);
+
+      document.getElementById(columnId).appendChild(task);
+      input.value = '';
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
